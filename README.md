@@ -1,257 +1,138 @@
-# Capstone Project Starter Template
-CSC 489 - Web Application Security | Spring 2026
+# EagleMart - Student Marketplace
+**CSC 489 - Web Application Security | Spring 2026**
+**Team Cipher**
 
-This is a minimal boilerplate template to get you started with your capstone project. It includes a Next.js frontend, Flask backend, and SQLite database.
+EagleMart is a campus marketplace where students can buy and sell items like textbooks, electronics, furniture, and more. The platform features user authentication, listing management, search, and messaging — built with intentional security vulnerabilities for educational penetration testing.
 
-## Quick Start
+## Setup
 
 ### Prerequisites
 
-Make sure you have these installed:
-- **Node.js** v18+ ([download](https://nodejs.org/))
-- **Python** 3.8+ ([download](https://www.python.org/downloads/))
+- **Node.js** v18+
+- **Python** 3.8+
 
-Check versions:
-```bash
-node --version
-python --version  # or python3 --version
-```
-
-### Installation
-
-**1. Setup Backend (Flask) with Virtual Environment**
+### 1. Backend
 
 ```bash
 cd backend
-
-# Create virtual environment
-python3 -m venv venv  # macOS/Linux
-# OR
-python -m venv venv   # Windows
-
-# Activate virtual environment
+python3 -m venv venv
 source venv/bin/activate      # macOS/Linux
-# OR
-venv\Scripts\activate         # Windows
+# OR venv\Scripts\activate    # Windows
 
-# You should see (venv) in your terminal
-
-# Install dependencies
 pip install -r requirements.txt
-
-# Run backend
 python app.py
 ```
 
-Backend will run on: `http://localhost:5000`
+Runs on `http://localhost:5000`
 
-**IMPORTANT:** Keep this terminal open and running!
-
----
-
-**2. Setup Frontend (Next.js)** 
-
-Open a **NEW** terminal window:
+### 2. Frontend
 
 ```bash
 cd frontend
-
-# Install dependencies
 npm install
-
-# Run frontend
 npm run dev
 ```
 
-Frontend will run on: `http://localhost:3000`
+Runs on `http://localhost:3000`
 
----
+### Default Credentials
 
-**3. Open in Browser**
+| Username | Password  | Role  |
+|----------|-----------|-------|
+| admin    | admin123  | admin |
 
-Go to: [http://localhost:3000](http://localhost:3000)
+## Tech Stack
 
-You should see the starter page with a green "Connected" message.
+| Layer    | Technology                        |
+|----------|-----------------------------------|
+| Frontend | Next.js 14, React 18, Lucide Icons |
+| Backend  | Flask 3.0, Python                 |
+| Database | SQLite 3                          |
 
-## Project Structure
+## Frontend Architecture
 
 ```
-capstone-starter-template/
-├── backend/                # Flask API
-│   ├── app.py             # Main Flask application
-│   ├── requirements.txt   # Python dependencies
-│   ├── venv/              # Virtual environment (created by you)
-│   ├── database.db        # SQLite database (auto-created)
-│   └── README.md          # Backend documentation
+frontend/
+├── public/
+│   └── logo.svg                        # EagleMart logo
 │
-├── frontend/              # Next.js UI
-│   ├── app/               # Pages and components
-│   │   ├── layout.jsx    # Main layout
-│   │   └── page.jsx      # Home page
-│   ├── package.json       # Node dependencies
-│   ├── node_modules/      # Node packages (created by npm install)
-│   └── README.md          # Frontend documentation
+├── app/
+│   ├── globals.css                     # Global styles (black/white/gold theme)
+│   ├── layout.jsx                      # Root layout — wraps all pages
+│   ├── page.jsx                        # / — Landing page (hero, categories, recent listings)
+│   │
+│   ├── components/
+│   │   └── Navbar.jsx                  # Sticky nav — logo, links, auth state
+│   │
+│   ├── login/
+│   │   └── page.jsx                    # /login — Sign-in form
+│   │
+│   ├── register/
+│   │   └── page.jsx                    # /register — Registration form
+│   │
+│   ├── listings/
+│   │   ├── page.jsx                    # /listings — Browse all, filter by category
+│   │   └── [id]/
+│   │       └── page.jsx                # /listings/:id — Detail view, contact seller
+│   │
+│   ├── create-listing/
+│   │   └── page.jsx                    # /create-listing — Post a new item
+│   │
+│   ├── profile/
+│   │   └── [id]/
+│   │       └── page.jsx                # /profile/:id — User profile + their listings
+│   │
+│   └── search/
+│       └── page.jsx                    # /search — Search with quick filters
 │
-└── README.md              # This file
+├── package.json
+└── next.config.js
 ```
 
-## Default Test User
-
-The database comes with one test user:
-- **Username:** `admin`
-- **Password:** `admin123`
-
-## Daily Workflow
-
-### Starting Your Work Session
-
-**Terminal 1 (Backend):**
-```bash
-cd backend
-source venv/bin/activate  # Activate venv first!
-python app.py
-```
-
-**Terminal 2 (Frontend):**
-```bash
-cd frontend
-npm run dev
-```
-
-### Stopping Your Work Session
-
-**Terminal 1:** Press `Ctrl+C` to stop Flask, then `deactivate` to exit venv
-
-**Terminal 2:** Press `Ctrl+C` to stop Next.js
-
-## What to Build
-
-This template provides the basic structure. You need to:
-
-1. **Design your application** - What will it do? Who uses it?
-2. **Add features** - Login, profiles, posts, search, etc.
-3. **Implement vulnerabilities** - SQL injection, XSS, CSRF, IDOR, etc.
-4. **Document everything** - README, code comments, vulnerability notes
-
-## Adding Features
-
-### Backend (Flask)
-
-Add new API endpoints in `backend/app.py`:
-
-```python
-@app.route('/api/your-endpoint', methods=['POST'])
-def your_function():
-    data = request.get_json()
-    # Your logic here
-    return jsonify({'message': 'Success!'})
-```
-
-### Frontend (Next.js)
-
-Create new pages in `frontend/app/`:
+### Page Flow
 
 ```
-frontend/app/
-└── your-page/
-    └── page.jsx
+Landing (/)
+  ├── Browse Listings (/listings)
+  │     └── Listing Detail (/listings/:id)
+  │           └── Contact Seller (form)
+  ├── Search (/search)
+  │     └── Listing Detail (/listings/:id)
+  ├── Create Listing (/create-listing)  [auth required]
+  ├── Profile (/profile/:id)
+  ├── Login (/login)
+  └── Register (/register)
 ```
 
-This creates the route: `http://localhost:3000/your-page`
+### Data Flow
 
-## Resources
-
-- **AI Prompt Library** (Canvas Files) - 50+ prompts to generate features
-- **Vulnerability Guide** (Canvas Files) - Code examples for each vulnerability type
-- **Quick Reference** (Canvas Files) - Troubleshooting and commands
-- **Next.js Docs:** https://nextjs.org/docs
-- **Flask Docs:** https://flask.palletsprojects.com/
+```
+┌─────────────┐       fetch()        ┌──────────────┐      raw SQL      ┌──────────┐
+│   Next.js   │ ──────────────────►  │  Flask API   │ ────────────────► │  SQLite  │
+│  (port 3000)│ ◄──────────────────  │ (port 5000)  │ ◄──────────────── │   (.db)  │
+└─────────────┘       JSON           └──────────────┘     results       └──────────┘
+       │
+       ├── localStorage (auth token, user object)
+       ├── No CSRF tokens
+       └── dangerouslySetInnerHTML (XSS surface)
+```
 
 ## Troubleshooting
 
-**"externally-managed-environment" error (macOS/Linux):**
+**Frontend won't start:**
 ```bash
-# You forgot to activate venv!
-cd backend
-source venv/bin/activate
-pip install -r requirements.txt
+cd frontend && rm -rf node_modules package-lock.json && npm install && npm run dev
 ```
 
 **Backend won't start:**
 ```bash
-# Make sure you're in the backend folder with venv activated
-cd backend
-source venv/bin/activate  # macOS/Linux
-pip install --upgrade pip
-pip install -r requirements.txt
-python app.py
+cd backend && source venv/bin/activate && pip install -r requirements.txt && python app.py
 ```
 
-**Frontend won't start:**
+**Database errors:** Delete `backend/database.db` and restart Flask — it auto-recreates.
+
+**Port in use:**
 ```bash
-# Make sure you're in the frontend folder
-cd frontend
-rm -rf node_modules package-lock.json
-npm install
-npm run dev
-```
-
-**"Backend not running" message:**
-- Make sure Flask is running on port 5000
-- Check for error messages in the Flask terminal
-- Try restarting both servers
-
-**Database errors:**
-- Delete `backend/database.db` and restart Flask
-- Database will auto-recreate with test user
-
-**Port already in use:**
-```bash
-# Find and kill process on port 5000
-lsof -i :5000
+lsof -i :5000   # find PID
 kill -9 [PID]
-
-# Or use different port in app.py
-app.run(debug=True, port=5001)
 ```
-
-## Git/Version Control
-
-### .gitignore File
-
-Create `.gitignore` in your project root:
-
-```
-# Python
-__pycache__/
-*.pyc
-*.pyo
-*.db
-venv/
-env/
-
-# Node
-node_modules/
-.next/
-out/
-
-# OS
-.DS_Store
-.env
-```
-
-**IMPORTANT:** Add `venv/` to `.gitignore` - never commit your virtual environment!
-
-## Need Help?
-
-- **In-class:** Tuesday & Thursday work sessions
-- **Office Hours:** Tu-Th 3:00-3:55 PM, TEC 380
-- **Email:** oluseyi.olukola@usm.edu
-
----
-
-**You're ready to start building! 🚀**
-
-Customize this template, add your features, and implement your vulnerabilities.
-
-Good luck!

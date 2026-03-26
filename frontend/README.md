@@ -1,76 +1,31 @@
-# Next.js Frontend
+# EagleMart Frontend
 
-This is the frontend for your capstone project.
+Next.js 14 frontend for the EagleMart student marketplace.
 
 ## Setup
 
-1. Install dependencies:
 ```bash
 npm install
-```
-
-2. Run the development server:
-```bash
 npm run dev
 ```
 
-3. Open [http://localhost:3000](http://localhost:3000) in your browser
+Open [http://localhost:3000](http://localhost:3000)
 
-## Project Structure
+## Pages
 
-```
-app/
-├── layout.jsx      # Main layout (wraps all pages)
-├── page.jsx        # Home page (/)
-└── [your-pages]/   # Add your pages here
-```
+| Route | Description |
+|---|---|
+| `/` | Landing — hero, categories, recent listings |
+| `/login` | Sign-in form |
+| `/register` | Registration form |
+| `/listings` | Browse all listings, filter by category |
+| `/listings/[id]` | Listing detail, contact seller |
+| `/create-listing` | Post a new listing |
+| `/profile/[id]` | User profile and their listings |
+| `/search` | Search with quick category filters |
 
-## Adding New Pages
+## Dependencies
 
-Create a new folder in `app/` with a `page.jsx` file:
-
-```
-app/
-└── login/
-    └── page.jsx    # This creates the /login route
-```
-
-Example page:
-```javascript
-export default function LoginPage() {
-  return <h1>Login Page</h1>;
-}
-```
-
-## Making API Calls
-
-Example of calling your Flask backend:
-
-```javascript
-'use client';
-
-import { useState } from 'react';
-
-export default function ExamplePage() {
-  const [data, setData] = useState(null);
-
-  const fetchData = async () => {
-    const response = await fetch('http://localhost:5000/api/test');
-    const json = await response.json();
-    setData(json);
-  };
-
-  return (
-    <div>
-      <button onClick={fetchData}>Fetch Data</button>
-      {data && <pre>{JSON.stringify(data, null, 2)}</pre>}
-    </div>
-  );
-}
-```
-
-## Important Notes
-
-- Use `'use client'` at the top of files that use hooks (useState, useEffect, etc.)
-- Backend API is at `http://localhost:5000`
-- All routes are file-based (folder structure = URL structure)
+- `next` 14.0.4
+- `react` 18.2
+- `lucide-react` — icons
