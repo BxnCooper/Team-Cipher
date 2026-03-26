@@ -1,54 +1,44 @@
 """
-Flask Backend - Capstone Project Starter Template
-CSC 489 - Spring 2026
+Flask Backend - Team Cipher Marketplace
+Connected to SQLite Database
 
-This is a minimal Flask application to get you started.
-Add your features and vulnerabilities here!
+This backend provides API endpoints for the Team Cipher marketplace,
+handling users, listings, messages, and reviews.
 """
 
 from flask import Flask, request, jsonify
 from flask_cors import CORS
-import sqlite3
+import sys
 import os
+
+# Add parent directory to path so we can import database module
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+from database import (
+    initialize_db,
+    add_user,
+    get_users,
+    get_user_by_id,
+    get_user_by_username,
+    update_user,
+    delete_user,
+    add_listing,
+    get_listings,
+    get_listing_by_id,
+    get_user_listings,
+    update_listing,
+    delete_listing,
+)
 
 app = Flask(__name__)
 CORS(app)  # Enable CORS for Next.js frontend
 
-# Database configuration
-DATABASE = 'database.db'
-
-def get_db():
-    """Get database connection"""
-    conn = sqlite3.connect(DATABASE)
-    conn.row_factory = sqlite3.Row  # Return rows as dictionaries
-    return conn
-
-def init_db():
-    """Initialize database with basic users table"""
-    if not os.path.exists(DATABASE):
-        conn = get_db()
-        conn.execute('''
-            CREATE TABLE IF NOT EXISTS users (
-                id INTEGER PRIMARY KEY AUTOINCREMENT,
-                username TEXT NOT NULL UNIQUE,
-                password TEXT NOT NULL,
-                email TEXT,
-                created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-            )
-        ''')
-        
-        # Insert a test user
-        conn.execute(
-            "INSERT INTO users (username, password, email) VALUES (?, ?, ?)",
-            ('admin', 'admin123', 'admin@example.com')
-        )
-        
-        conn.commit()
-        conn.close()
-        print("Database initialized!")
-
 # Initialize database on startup
-init_db()
+try:
+    initialize_db()
+    print("✓ Database connected successfully!")
+except Exception as e:
+    print(f"✗ Database initialization error: {e}")
 
 # ============================================================================
 # BASIC EXAMPLE ENDPOINTS
@@ -350,51 +340,222 @@ def home():
 
 @app.route('/api/test')
 def test():
-    """Test endpoint to verify API is working"""
-    return jsonify({
-        'message': 'API is working!',
-        'backend': 'Flask',
-        'database': 'SQLite'
-    })
+    """Test endpoint to verify API and database are working"""
+    try:
+        users = get_users()
+        return jsonify({
+            'message': '✓ API and Database working!',
+            'status': 'online',
+            'backend': 'Flask',
+            'database': 'SQLite',
+            'users_count': len(users)
+        })
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
 # ============================================================================
-# ADD YOUR ENDPOINTS BELOW
+# USER ENDPOINTS
 # ============================================================================
 
-# Example: Login endpoint (you can modify or replace this)
+@app.route('/api/users', methods=['GET'])
+def get_all_users():
+    """Get all users from database"""
+    try:
+        users = get_users()
+        return jsonify(users)
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/users/<int:user_id>', methods=['GET'])
+def get_user(user_id):
+    """Get a specific user by ID"""
+    try:
+        user = get_user_by_id(user_id)
+        if user:
+            return jsonify(user)
+        return jsonify({'error': 'User not found'}), 404
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/users/username/<username>', methods=['GET'])
+def get_user_route(username):
+    """Get a user by username (useful for login)"""
+    try:
+        user = get_user_by_username(username)
+        if user:
+            return jsonify(user)
+        return jsonify({'error': 'User not found'}), 404
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/users', methods=['POST'])
+def create_user():
+    """Create a new user"""
+    try:
+        data = request.get_json()
+        username = data.get('username')
+        email = data.get('email')
+        password = data.get('password')
+        
+        if not username or not email or not password:
+            return jsonify({'error': 'Missing required fields'}), 400
+        
+        user_id = add_user(username, email, password)
+        if user_id:
+            return jsonify({
+                'id': user_id,
+                'username': username,
+                'email': email,
+                'message': 'User created successfully'
+            }), 201
+        return jsonify({'error': 'Failed to create user'}), 400
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/users/<int:user_id>', methods=['PUT'])
+def update_user_route(user_id):
+    """Update user information"""
+    try:
+        data = request.get_json()
+        success = update_user(
+            user_id,
+            username=data.get('username'),
+            email=data.get('email'),
+            password=data.get('password')
+        )
+        if success:
+            user = get_user_by_id(user_id)
+            return jsonify(user)
+        return jsonify({'error': 'User not found'}), 404
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/users/<int:user_id>', methods=['DELETE'])
+def delete_user_route(user_id):
+    """Delete a user"""
+    try:
+        success = delete_user(user_id)
+        if success:
+            return jsonify({'message': 'User deleted successfully'})
+        return jsonify({'error': 'User not found'}), 404
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+# ============================================================================
+# LISTINGS ENDPOINTS
+# ============================================================================
+
+@app.route('/api/listings', methods=['GET'])
+def get_all_listings():
+    """Get all listings"""
+    try:
+        listings = get_listings()
+        return jsonify(listings)
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/listings/<int:listing_id>', methods=['GET'])
+def get_listing(listing_id):
+    """Get a specific listing by ID"""
+    try:
+        listing = get_listing_by_id(listing_id)
+        if listing:
+            return jsonify(listing)
+        return jsonify({'error': 'Listing not found'}), 404
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/users/<int:user_id>/listings', methods=['GET'])
+def get_user_listings_route(user_id):
+    """Get all listings from a specific user"""
+    try:
+        listings = get_user_listings(user_id)
+        return jsonify(listings)
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/listings', methods=['POST'])
+def create_listing():
+    """Create a new listing"""
+    try:
+        data = request.get_json()
+        user_id = data.get('user_id')
+        title = data.get('title')
+        description = data.get('description')
+        price = data.get('price')
+        category = data.get('category')
+        
+        if not all([user_id, title, price, category]):
+            return jsonify({'error': 'Missing required fields'}), 400
+        
+        listing_id = add_listing(user_id, title, description, price, category)
+        if listing_id:
+            return jsonify({
+                'id': listing_id,
+                'user_id': user_id,
+                'title': title,
+                'price': price,
+                'category': category,
+                'message': 'Listing created successfully'
+            }), 201
+        return jsonify({'error': 'Failed to create listing'}), 400
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/listings/<int:listing_id>', methods=['PUT'])
+def update_listing_route(listing_id):
+    """Update a listing"""
+    try:
+        data = request.get_json()
+        success = update_listing(
+            listing_id,
+            title=data.get('title'),
+            description=data.get('description'),
+            price=data.get('price'),
+            category=data.get('category')
+        )
+        if success:
+            listing = get_listing_by_id(listing_id)
+            return jsonify(listing)
+        return jsonify({'error': 'Listing not found'}), 404
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+@app.route('/api/listings/<int:listing_id>', methods=['DELETE'])
+def delete_listing_route(listing_id):
+    """Delete a listing"""
+    try:
+        success = delete_listing(listing_id)
+        if success:
+            return jsonify({'message': 'Listing deleted successfully'})
+        return jsonify({'error': 'Listing not found'}), 404
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
+
+# ============================================================================
+# LEGACY ENDPOINTS (deprecated, use endpoints above instead)
+# ============================================================================
+
 @app.route('/api/login', methods=['POST'])
 def login():
     """
-    Example login endpoint
-    
-    TODO: Add your authentication logic here
-    HINT: This is where you might add SQL injection vulnerability!
+    Legacy login endpoint (deprecated)
+    Use /api/users/username/<username> instead
     """
-    data = request.get_json()
-    username = data.get('username', '')
-    password = data.get('password', '')
-    
-    # TODO: Implement your login logic
-    # EXAMPLE (modify as needed):
-    # conn = get_db()
-    # user = conn.execute(
-    #     "SELECT * FROM users WHERE username=? AND password=?",
-    #     (username, password)
-    # ).fetchone()
-    # conn.close()
-    
-    return jsonify({
-        'message': 'Login endpoint - implement your logic here',
-        'username': username
-    })
-
-# TODO: Add more endpoints for your application features
-# Examples:
-# - POST /api/register - User registration
-# - GET /api/profile/<user_id> - Get user profile
-# - POST /api/posts - Create a post
-# - GET /api/posts - Get all posts
-# - GET /api/search?q=query - Search functionality
+    try:
+        data = request.get_json()
+        username = data.get('username', '')
+        password = data.get('password', '')
+        
+        user = get_user_by_username(username)
+        if user and user['password'] == password:
+            return jsonify({
+                'message': 'Login successful',
+                'user': dict(user)
+            })
+        return jsonify({'error': 'Invalid credentials'}), 401
+    except Exception as e:
+        return jsonify({'error': str(e)}), 500
 
 # ============================================================================
 # RUN SERVER
