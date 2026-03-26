@@ -4,7 +4,7 @@ import Navbar from '../../components/Navbar';
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
-import { getMockListing } from '../../lib/mock-data';
+
 import { ArrowLeft, Send, User, CalendarDays } from 'lucide-react';
 
 const API = 'http://localhost:5000';
@@ -29,7 +29,7 @@ export default function ListingDetailPage() {
         setLoading(false);
       })
       .catch(() => {
-        setListing(getMockListing(id));
+        setListing(null);
         setLoading(false);
       });
   }, [id]);

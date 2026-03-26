@@ -3,7 +3,7 @@
 import Navbar from '../components/Navbar';
 import Link from 'next/link';
 import { useState } from 'react';
-import { getMockListings } from '../lib/mock-data';
+
 import { Search, ShoppingCart } from 'lucide-react';
 
 const API = 'http://localhost:5000';
@@ -44,7 +44,7 @@ export default function SearchPage() {
       }
     } catch (err) {
       // Fallback to mock data when backend is unavailable
-      setResults(getMockListings({ query: searchQuery }));
+      setResults([]);
     }
     setLoading(false);
   };

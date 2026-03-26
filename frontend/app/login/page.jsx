@@ -3,7 +3,7 @@
 import Navbar from '../components/Navbar';
 import Link from 'next/link';
 import { useState } from 'react';
-import { mockUsers } from '../lib/mock-data';
+
 
 const API = 'http://localhost:5000';
 
@@ -39,15 +39,7 @@ export default function LoginPage() {
         setError(data.error || data.message || 'Login failed');
       }
     } catch (err) {
-      // Fallback: mock login when backend is unavailable
-      const mockUser = mockUsers.find(u => u.username === username);
-      if (mockUser) {
-        localStorage.setItem('user', JSON.stringify(mockUser));
-        localStorage.setItem('token', 'mock-token-' + mockUser.id);
-        window.location.href = '/';
-      } else {
-        setError('Invalid username (mock mode - try: admin, jsmith, emilyr, carlos99, priya_k)');
-      }
+      setError('Cannot connect to server');
     }
 
     setLoading(false);

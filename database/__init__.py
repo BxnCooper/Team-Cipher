@@ -1,26 +1,20 @@
-"""
-Database Package for Team Cipher
-
-This package handles all database operations for the Team Cipher application.
-"""
-
 from .db import (
     initialize_db,
     get_connection,
-    # User functions
     add_user,
     get_users,
     get_user_by_id,
     get_user_by_username,
     update_user,
     delete_user,
-    # Listing functions
     add_listing,
     get_listings,
     get_listing_by_id,
     get_user_listings,
+    search_listings,
     update_listing,
     delete_listing,
+    add_message,
 )
 
 __all__ = [
@@ -36,6 +30,8 @@ __all__ = [
     "get_listings",
     "get_listing_by_id",
     "get_user_listings",
+    "search_listings",
     "update_listing",
     "delete_listing",
+    "add_message",
 ]

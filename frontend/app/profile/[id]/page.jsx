@@ -4,7 +4,7 @@ import Navbar from '../../components/Navbar';
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
-import { getMockUser, getMockUserListings } from '../../lib/mock-data';
+
 import { Mail, Calendar, Shield, Plus } from 'lucide-react';
 
 const API = 'http://localhost:5000';
@@ -34,8 +34,8 @@ export default function ProfilePage() {
         setLoading(false);
       })
       .catch(() => {
-        setProfile(getMockUser(id));
-        setListings(getMockUserListings(id));
+        setProfile(null);
+        setListings([]);
         setLoading(false);
       });
 

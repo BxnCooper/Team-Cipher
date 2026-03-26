@@ -4,7 +4,7 @@ import Navbar from '../components/Navbar';
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
-import { getMockListings } from '../lib/mock-data';
+
 
 const API = 'http://localhost:5000';
 
@@ -42,7 +42,7 @@ export default function ListingsPage() {
         setLoading(false);
       })
       .catch(() => {
-        setListings(getMockListings({ category: activeCategory || undefined }));
+        setListings([]);
         setLoading(false);
       });
   }, [activeCategory]);

@@ -3,7 +3,7 @@
 import Navbar from './components/Navbar';
 import Link from 'next/link';
 import { useState, useEffect } from 'react';
-import { getMockListings } from './lib/mock-data';
+
 import { BookOpen, Monitor, Armchair, Shirt, Dumbbell, Package } from 'lucide-react';
 
 const API = 'http://localhost:5000';
@@ -29,7 +29,7 @@ export default function Home() {
     fetch(`${API}/api/listings?limit=6`)
       .then(res => res.json())
       .then(data => setRecentListings(data.listings || []))
-      .catch(() => setRecentListings(getMockListings({ limit: 6 })));
+      .catch(() => {});
   }, []);
 
   return (
