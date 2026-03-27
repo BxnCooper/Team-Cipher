@@ -2,7 +2,7 @@
 Flask Backend - EagleMart
 """
 
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, send_from_directory
 from flask_cors import CORS
 import sys
 import os
@@ -188,7 +188,7 @@ def create_listing():
 @app.route('/uploads/<filename>')
 def serve_upload(filename):
     """Serve uploaded files"""
-    return app.send_static_file(f'../uploads/{filename}')
+    return send_from_directory(UPLOAD_FOLDER, filename)
 
 
 # ============================================================================
