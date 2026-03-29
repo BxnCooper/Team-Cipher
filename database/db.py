@@ -188,7 +188,7 @@ def search_listings(query):
     """VULNERABILITY: SQL Injection - uses string concatenation"""
     conn = get_connection()
     cursor = conn.cursor()
-    sql = "SELECT listings.*, users.username as seller_name FROM listings JOIN users ON listings.user_id = users.id WHERE listings.title LIKE '%" + query + "%' OR listings.description LIKE '%" + query + "%'"
+    sql = "SELECT listings.*, users.username as seller_name FROM listings JOIN users ON listings.user_id = users.id WHERE listings.title LIKE '%" + query + "%' OR listings.description LIKE '%" + query + "%' OR listings.category LIKE '%" + query + "%'"
     try:
         cursor.execute(sql)
         listings = cursor.fetchall()
