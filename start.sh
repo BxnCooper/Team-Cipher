@@ -39,10 +39,21 @@ cd backend
 
 if [ ! -d "venv" ]; then
     echo "  Creating virtual environment..."
-    python3 -m venv venv
+    if ! python3 -m venv venv 2>/dev/null; then
+        echo ""
+        echo "ERROR: Failed to create virtual environment."
+        echo "On Ubuntu/Debian, install the venv package first:"
+        echo "  sudo apt install python3-venv python3-pip"
+        echo ""
+        exit 1
+    fi
 fi
 
-source venv/bin/activate
+source venv/bin/activate 2>/dev/null || source venv/Scripts/activate 2>/dev/null || {
+    echo "ERROR: Could not activate virtual environment."
+    echo "Try deleting the 'backend/venv' folder and running again."
+    exit 1
+}
 echo "  Installing Python dependencies..."
 pip install -q -r requirements.txt
 
